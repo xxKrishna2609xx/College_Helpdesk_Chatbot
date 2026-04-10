@@ -60,7 +60,7 @@ def _resolve_model_candidates() -> list[str]:
 	return PREFERRED_MODELS
 
 
-def get_fallback_ai_response(user_query: str) -> str:
+def get_fallback_ai_response(user_query: str, response_language: str = "English") -> str:
 	"""Generate a fallback answer from a generative AI model.
 
 	The API key is read from a .env file using python-dotenv.
@@ -70,6 +70,7 @@ def get_fallback_ai_response(user_query: str) -> str:
 
 	Args:
 		user_query: The user's input query.
+		response_language: Preferred language for AI output (e.g., English, Hindi).
 
 	Returns:
 		AI-generated response text, or a user-friendly error message.
@@ -94,6 +95,14 @@ def get_fallback_ai_response(user_query: str) -> str:
 
 	try:
 		genai.configure(api_key=api_key)
+		language_instruction = ""
+		if response_language.strip().lower() == "hindi":
+			language_instruction = (
+				"Please respond in Hindi (Devanagari script) with clear, "
+				"student-friendly wording.\n"
+			)
+		prompt = f"{language_instruction}User query: {user_query.strip()}"
+
 		last_error_text = ""
 		for model_name in _resolve_model_candidates():
 			try:
@@ -101,7 +110,7 @@ def get_fallback_ai_response(user_query: str) -> str:
 					model_name=model_name,
 					system_instruction=SYSTEM_PROMPT,
 				)
-				response = model.generate_content(user_query)
+				response = model.generate_content(prompt)
 
 				text = (response.text or "").strip() if response else ""
 				if text:
