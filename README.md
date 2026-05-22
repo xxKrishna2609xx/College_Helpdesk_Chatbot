@@ -100,7 +100,7 @@ graph TD
 
 ---
 
-## 📝 Example Questions to Try
+## 📝 Example Questions to Tryii
 
 Here are some verified questions you can ask the chatbot right now:
 
